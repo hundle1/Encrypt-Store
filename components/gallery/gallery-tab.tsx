@@ -13,7 +13,7 @@ const GalleryTab: React.FC<GalleryTabProps> = ({ image }) => {
             {({ selected }) => (
                 <div>
                     <span className='absolute inset-0 w-full h-full overflow-hidden rounded-md aspect-square'>
-                        <Image fill alt="" src={image.url} className='object-cover object-center' />
+                        <Image fill alt="" src={image.url} className='object-cover object-center ' />
                     </span>
                     <span className={cn("absolute inset-0 rounded-md ring-2 ring-offset-2", selected ? "ring-black" : 'ring-transparent')} />
                 </div>

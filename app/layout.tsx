@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { Urbanist } from 'next/font/google'
 import ModalProvider from '@/providers/modal-provider'
 import ToastProvider from '@/providers/toast-provider'
+import { ClerkProvider } from '@clerk/nextjs'
 
 const urban = Urbanist({ subsets: ['latin'] })
 
@@ -18,14 +19,17 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={urban.className}>
-        <ModalProvider />
-        <ToastProvider />
-        <Navbar />
-        {children}
-        <Footer />
-        </body>
-    </html>
+    <ClerkProvider>
+        <html lang="en">
+          <body className={urban.className}>
+            <ModalProvider />
+            <ToastProvider />
+            <Navbar />
+            {children}
+            <Footer />
+            </body>
+        </html>
+    </ClerkProvider>
+    
   )
 }

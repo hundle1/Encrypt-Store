@@ -15,9 +15,11 @@ export interface Product {
     category: Category;
     name: string;
     price: string;
+    createdAt: string;
+    updatedAt: string;
     isFeatured: boolean;
-    size: Size;
-    color: Color;
+    type: Type;
+    creator: Creator;
     images: Image[]
 }
 
@@ -26,13 +28,11 @@ export interface Image {
     url: string;
 }
 
-export interface Size {
+export interface Type {
     id: string;
     name: string;
-    value: string;
 }
-export interface Color {
+export interface Creator {
     id: string;
     name: string;
-    value: string;
 }

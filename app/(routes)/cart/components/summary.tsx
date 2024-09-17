@@ -15,11 +15,11 @@ const Summary = () => {
     const totalPrice = items.reduce((total, item) => total + Number(item.price), 0)
 
     useEffect(() => {
-        if(searchParams.get('success')) {
+        if (searchParams.get('success')) {
             toast.success("Payment completed.");
             removeAll();
         }
-        if(searchParams.get("canceled")) {
+        if (searchParams.get("canceled")) {
             toast.error("Something went wrong.")
         }
     }, [searchParams, removeAll])
@@ -32,7 +32,7 @@ const Summary = () => {
         window.location = response.data.url
     }
 
-    return ( 
+    return (
         <div className='px-4 py-6 mt-16 rounded-lg bg-gray-50 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8'>
             <h2 className='text-lg font-medium text-gray-900'>Order Summary</h2>
             <div className='mt-6 space-y-4'>
@@ -47,7 +47,7 @@ const Summary = () => {
                 Checkout
             </Button>
         </div>
-     );
+    );
 }
- 
+
 export default Summary;

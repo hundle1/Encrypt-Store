@@ -1,7 +1,7 @@
 import getCategory from "@/actions/get-category";
-import getColors from "@/actions/get-colors";
+import getCreators from "@/actions/get-creators";
 import getProducts from "@/actions/get-products";
-import getSizes from "@/actions/get-sizes";
+import getTypes from "@/actions/get-types";
 import Billboard from "@/components/billboard";
 import Container from "@/components/ui/container";
 import Filter from "./components/filter";
@@ -16,19 +16,19 @@ interface CategoryPageProps {
         categoryId: string;
     },
     searchParams: {
-        colorId: string;
-        sizeId: string;
+        creatorId: string;
+        typeId: string;
     }
 }
 
 const CategoryPage:React.FC<CategoryPageProps> = async ({ params, searchParams }) => {
     const products = await getProducts({
         categoryId: params.categoryId,
-        colorId: searchParams.colorId,
-        sizeId: searchParams.sizeId
+        creatorId: searchParams.creatorId,
+        typeId: searchParams.typeId
     })
-    const sizes = await getSizes();
-    const colors = await getColors();
+    const types = await getTypes();
+    const creators = await getCreators();
     const category = await getCategory(params.categoryId)
     console.log(category);
     return ( 
@@ -38,18 +38,18 @@ const CategoryPage:React.FC<CategoryPageProps> = async ({ params, searchParams }
                 <div className="px-4 pb-24 sm:px-6 lg:px-8">
                     <div className="lg:grid lg:grid-cols-5 lg:gap-x-8">
                         {/*Add Mobile Filters*/}
-                        <MobileFilters sizes={sizes} colors={colors} />
+                        <MobileFilters types={types} creators={creators} />
                         {/*Add Computer Filters*/}
                         <div className="hidden lg:block">
                             <Filter
-                                valueKey="sizeId"
-                                name="Sizes"
-                                data={sizes}
+                                valueKey="typeId"
+                                name="Types"
+                                data={types}
                             />
                             <Filter
-                                valueKey="colorId"
-                                name="Colors"
-                                data={colors}
+                                valueKey="creatorId"
+                                name="Creators"
+                                data={creators}
                             />
                         </div>
                         <div className="mt-6 lg:col-span-4 lg:mt-0">
