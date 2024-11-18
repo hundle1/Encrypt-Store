@@ -21,7 +21,7 @@ interface CategoryPageProps {
     }
 }
 
-const CategoryPage:React.FC<CategoryPageProps> = async ({ params, searchParams }) => {
+const CategoryPage: React.FC<CategoryPageProps> = async ({ params, searchParams }) => {
     const products = await getProducts({
         categoryId: params.categoryId,
         creatorId: searchParams.creatorId,
@@ -31,7 +31,7 @@ const CategoryPage:React.FC<CategoryPageProps> = async ({ params, searchParams }
     const creators = await getCreators();
     const category = await getCategory(params.categoryId)
     console.log(category);
-    return ( 
+    return (
         <div className="bg-white">
             <Container>
                 <Billboard data={category?.billboard} />
@@ -53,7 +53,7 @@ const CategoryPage:React.FC<CategoryPageProps> = async ({ params, searchParams }
                             />
                         </div>
                         <div className="mt-6 lg:col-span-4 lg:mt-0">
-                            {products?.length === 0 && <NoResults /> }
+                            {products?.length === 0 && <NoResults />}
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                                 {products?.map(item => (
                                     <ProductCard key={item.id} data={item} />

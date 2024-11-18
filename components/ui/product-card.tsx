@@ -33,7 +33,7 @@ const ProductCard: React.FC<ProductCard> = ({ data }) => {
         cart.addItem(data);
     }
 
-    return ( 
+    return (
         <div onClick={handleClick} className="p-3 space-y-4 bg-white border cursor-pointer group rounded-xl">
             {/* Images and Actions */}
             <div className="relative bg-gray-100 aspect-square rounded-xl">
@@ -46,14 +46,13 @@ const ProductCard: React.FC<ProductCard> = ({ data }) => {
                     <div className="flex justify-center gap-x-6">
                         <IconButton
                             onClick={onPreview}
-                            icon={<Expand size={20} className="text-gray-600" />}/>
+                            icon={<Expand size={20} className="text-gray-600" />} />
                         <IconButton
                             onClick={onAddToCart}
-                            icon={<ShoppingCart size={20} className="text-gray-600" />}/>
+                            icon={<ShoppingCart size={20} className="text-gray-600" />} />
                     </div>
                 </div>
             </div>
-            {/* Description */}
             <div>
                 <p className="text-lg font-semibold">
                     {data?.name}

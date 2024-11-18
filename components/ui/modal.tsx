@@ -26,14 +26,14 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, children }) => {
                             leave="ease-in duration-200"
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95">
-                                <Dialog.Panel className="w-full max-w-3xl overflow-hidden text-left align-middle rounded-lg">
-                                    <div className="relative flex items-center w-full px-4 pb-8 overflow-hidden bg-white shadow-2xl pt-14 sm:px-6 sm:pt-8 md:p-6 lg:p-8">
-                                        <div className="absolute right-4 top-4">
-                                            <IconButton onClick={onClose} icon={<X size={15} />} />
-                                        </div>
-                                        {children}
+                            <Dialog.Panel className="w-full max-w-3xl overflow-hidden text-left align-middle rounded-lg">
+                                <div className="relative flex items-center w-full px-4 pb-8 overflow-hidden bg-white shadow-2xl pt-14 sm:px-6 sm:pt-8 md:p-6 lg:p-8">
+                                    <div className="absolute right-4 top-4">
+                                        <IconButton onClick={onClose} icon={<X size={15} />} />
                                     </div>
-                                </Dialog.Panel>
+                                    {children}
+                                </div>
+                            </Dialog.Panel>
                         </Transition.Child>
                     </div>
                 </div>

@@ -1,10 +1,12 @@
-import { Footer, Navbar } from '@/components'
 import './globals.css'
 import type { Metadata } from 'next'
 import { Urbanist } from 'next/font/google'
 import ModalProvider from '@/providers/modal-provider'
 import ToastProvider from '@/providers/toast-provider'
 import { ClerkProvider } from '@clerk/nextjs'
+import Category from '@/components/catergory'
+import Navbar from '@/components/navbar'
+import Footer from '@/components/footer'
 
 const urban = Urbanist({ subsets: ['latin'] })
 
@@ -20,16 +22,17 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-        <html lang="en">
-          <body className={urban.className}>
-            <ModalProvider />
-            <ToastProvider />
-            <Navbar />
-            {children}
-            <Footer />
-            </body>
-        </html>
+      <html lang="en">
+        <body className={urban.className}>
+          <ModalProvider />
+          <ToastProvider />
+          <Navbar />
+          <Category />
+          {children}
+          <Footer />
+        </body>
+      </html>
     </ClerkProvider>
-    
+
   )
 }

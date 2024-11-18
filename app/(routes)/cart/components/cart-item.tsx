@@ -14,13 +14,12 @@ interface CartItemProps {
 const CartItem: React.FC<CartItemProps> = ({ data }) => {
 
     const cart = useCart();
-
     const onRemove = () => {
         cart.removeItem(data.id);
     }
 
     return (
-        <li className='flex py-6 border-b'>
+        <li className='flex items-center justify-between py-4'>
             <div className='relative w-24 h-24 overflow-hidden rounded-md sm:h-48 sm:w-48'>
                 <Image
                     fill

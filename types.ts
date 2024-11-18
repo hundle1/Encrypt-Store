@@ -5,6 +5,7 @@ export interface Billboard {
 }
 
 export interface Category {
+    products: any;
     id: string;
     name: string;
     billboard: Billboard;
@@ -14,6 +15,7 @@ export interface Product {
     id: string;
     category: Category;
     name: string;
+    describe: string;
     price: string;
     createdAt: string;
     updatedAt: string;
@@ -35,4 +37,10 @@ export interface Type {
 export interface Creator {
     id: string;
     name: string;
+}
+
+export interface Order {
+    id: string;
+    createdAt: string;
+    updatedAt: string;
 }
