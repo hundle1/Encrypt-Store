@@ -10,6 +10,7 @@ interface Query {
     isFeatured?: boolean;
     createdAt?: string;
     updatedAt?: string;
+    name?: string;
 }
 
 const getProducts = async (query: Query): Promise<Product[]> => {
@@ -21,7 +22,8 @@ const getProducts = async (query: Query): Promise<Product[]> => {
             categoryId: query.categoryId,
             isFeatured: query.isFeatured,
             createdAt: query.createdAt,
-            updatedAt: query.updatedAt
+            updatedAt: query.updatedAt,
+            name: query.name
         }
     })
     const res = await fetch(url);
