@@ -19,9 +19,38 @@ const ProductCard: React.FC<ProductCard> = ({ data }) => {
     const cart = useCart();
     const previewModal = usePreviewModal();
     const router = useRouter();
-    const handleClick = () => {
-        router.push(`/product/${data?.id}`)
-    }
+    const handleClick = async () => {
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/products/${data.id}/click`;
+        console.log("🔗 Gửi request đến:", url);
+    
+        const token = "YOUR_AUTH_TOKEN"; // Thay bằng token thật, có thể lấy từ localStorage hoặc context
+    
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`  // Thêm token vào request
+                },
+            });
+    
+            const result = await response.json();
+            console.log("📩 Kết quả API:", result);
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status} - ${result.error || "Unknown error"}`);
+            }
+    
+            console.log("✅ Click recorded successfully");
+        } catch (error) {
+            console.error("❌ Lỗi khi ghi nhận click:", error);
+        }
+    
+        router.push(`/product/${data.id}`);
+    };
+    
+    
+    
 
     const onPreview: MouseEventHandler<HTMLButtonElement> = (event) => {
         event.stopPropagation();

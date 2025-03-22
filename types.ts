@@ -22,7 +22,8 @@ export interface Product {
     isFeatured: boolean;
     type: Type;
     creator: Creator;
-    images: Image[]
+    images: Image[];
+    clickCount: number;  // 👈
 }
 
 export interface Image {
