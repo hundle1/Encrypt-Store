@@ -1,4 +1,5 @@
 "use client"
+import { useEffect, useState } from "react";
 import Currency from '@/components/ui/currency';
 import IconButton from '@/components/ui/icon-button';
 import useCart from '@/hooks/use-cart';
@@ -14,6 +15,15 @@ interface CartItemProps {
 const CartItem: React.FC<CartItemProps> = ({ data }) => {
 
     const cart = useCart();
+    const [items, setItems] = useState<Product[]>([]);
+    useEffect(() => {
+    const stored = localStorage.getItem("cart_items");
+    if (stored) setItems(JSON.parse(stored));
+    }, []);
+
+    useEffect(() => {
+    localStorage.setItem("cart_items", JSON.stringify(items));
+    }, [items]);
     const onRemove = () => {
         cart.removeItem(data.id);
     }

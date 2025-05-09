@@ -7,11 +7,12 @@ import { ClerkProvider } from '@clerk/nextjs'
 import Category from '@/components/catergory'
 import Navbar from '@/components/navbar'
 import Footer from '@/components/footer'
+import Providers from './providers'
 
 const urban = Urbanist({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Store',
+  title: 'Stack Market Store',
   description: 'Store',
 }
 
@@ -28,7 +29,9 @@ export default function RootLayout({
           <ToastProvider />
           <Navbar />
           <Category />
-          {children}
+          <Providers>
+            {children}
+          </Providers>
           <Footer />
         </body>
       </html>

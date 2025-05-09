@@ -1,30 +1,67 @@
 "use client";
 
+import { useStateContext } from '@/components/context';
 import Button from '@/components/ui/button';
 import Currency from '@/components/ui/currency';
 import useCart from '@/hooks/use-cart';
 import useCartChecking from '@/hooks/use-check';
-import axios from 'axios';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 
 interface SummaryProps {
-  onCheckout: () => void; 
+  onCheckout: () => void;
 }
 
 const Summary: React.FC<SummaryProps> = ({ onCheckout }) => {
-  const [startTimer, setStartTimer] = useState(false); 
   const searchParams = useSearchParams();
   const items = useCart((state) => state.items);
   const removeAll = useCart((state) => state.removeAll);
-  const addToCheck = useCartChecking((state) => state.addToCheck);
-  const removeAllChecks = useCartChecking((state) => state.removeAll);
+  
+  // Dùng hook useCartChecking để truy cập hàm addItem và removeAll
+  const check = useCartChecking();
+  const removeAllChecks = () => {
+    console.warn("removeAllChecks is not implemented in useCartChecking.");
+  };
   const totalPrice = items.reduce((total, item) => total + Number(item.price), 0);
+  const { address, connect, preBuy } = useStateContext();
+
+  const handleCheckout = async () => {
+    if (items.length === 0) return;
+
+    if (!address) {
+      await connect();
+      return;
+    }
+
+    const product = items[0];
+    const productId = product.id;
+
+    try {
+      const tx = await preBuy(productId);
+      // Nếu tx có phương thức wait, chờ xác nhận giao dịch
+      if (tx && tx.wait) {
+        await tx.wait();
+      }
+      toast.success("Payment completed.");
+      
+      // Xoá sản phẩm khỏi giỏ hàng (container 1)
+      removeAll(); 
+      
+      // Thêm sản phẩm vào danh sách đang kiểm tra (container 2)
+      check.addItem({ ...product, price: Number(product.price) });
+      
+      // Cập nhật lại trạng thái giao diện cha
+      onCheckout();
+    } catch (error) {
+      console.error("PreBuy error:", error);
+      toast.error("Pre-buy failed.");
+    }
+  };
 
   useEffect(() => {
     if (searchParams.get('success')) {
-      toast.success("Payment completed.");
+      toast.success("Payment completed via redirect.");
       removeAll();
       removeAllChecks();
     }
@@ -32,17 +69,6 @@ const Summary: React.FC<SummaryProps> = ({ onCheckout }) => {
       toast.error("Something went wrong.");
     }
   }, [searchParams, removeAll, removeAllChecks]);
-
-  const handleCheckout = async () => {
-    items.forEach((item) => addToCheck(item));
-    setStartTimer(true); 
-    onCheckout(); 
-    const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/checkout`, {
-      productIds: items.map((item) => item.id),
-    });
-
-    window.location = response.data.url;
-  };
 
   return (
     <div className='px-4 py-6 mt-16 rounded-lg bg-gray-50 sm:p-6 lg:col-span-5 lg:mt-0 lg:p-8'>

@@ -1,4 +1,6 @@
+"use client";
 import { FC } from 'react';
+import { useEffect, useState } from "react";
 import useCartChecking from '@/hooks/use-check';
 import Image from 'next/image';
 import Button from '@/components/ui/button';
@@ -11,7 +13,6 @@ interface CheckItemProps {
 
 const CheckItem: FC<CheckItemProps> = ({ data, onRemove }) => {
   const removeItem = useCartChecking((state) => state.removeItem);
-
   const handleRemoveClick = () => {
     removeItem(data.id);
     onRemove(); 

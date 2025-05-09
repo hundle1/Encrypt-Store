@@ -1,9 +1,15 @@
 "use client";
 
 import Button from "@/components/ui/button";
-import useCartChecking from "@/hooks/use-check";
 import { useState, useEffect } from "react";
 import TimeCountdown from "@/components/ui/time-countdown";
+
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
 
 interface SummaryCheckingProps {
   stopTimer: boolean;
@@ -21,11 +27,14 @@ const SummaryChecking: React.FC<SummaryCheckingProps> = ({
   onStartCountdown,
 }) => {
   const [isCheckoutDisabled, setIsCheckoutDisabled] = useState(false);
-  const items = useCartChecking((state) => state.items);
+  const [items, setItems] = useState<Product[]>([]);
 
   useEffect(() => {
+    // Điều chỉnh khi đếm ngược bắt đầu hoặc dừng lại
     if (startTimer) {
-      setIsCheckoutDisabled(false);
+      setIsCheckoutDisabled(false); // Cho phép checkout khi bắt đầu
+    } else {
+      setIsCheckoutDisabled(true); // Vô hiệu hóa checkout khi không có đếm ngược
     }
   }, [startTimer]);
 
@@ -39,7 +48,11 @@ const SummaryChecking: React.FC<SummaryCheckingProps> = ({
       <div className="mt-6 space-y-4">
         <div className="flex items-center justify-between pt-4 border-t border-gray-200">
           <div className="text-base font-medium text-gray-400">Time counter currently</div>
-          <TimeCountdown onTimeEnd={() => setIsCheckoutDisabled(true)} stopTimer={stopTimer} startTimer={startTimer} />
+          <TimeCountdown
+            onTimeEnd={() => setIsCheckoutDisabled(true)}
+            stopTimer={stopTimer}
+            startTimer={startTimer}
+          />
         </div>
       </div>
       <div className="flex gap-4">
@@ -53,8 +66,8 @@ const SummaryChecking: React.FC<SummaryCheckingProps> = ({
 
         <Button
           className="w-full mt-6 bg-red-600"
-          onClick={onStartCountdown} 
-          disabled={isStartCountdownDisabled}
+          onClick={onStartCountdown}
+          disabled={startTimer || isCheckoutDisabled} // Disabled nếu đếm ngược đã bắt đầu
         >
           Start CountDown
         </Button>

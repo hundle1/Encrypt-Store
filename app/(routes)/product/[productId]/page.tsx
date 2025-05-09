@@ -14,7 +14,7 @@ interface ProductPageProps {
 const ProductPage: React.FC<ProductPageProps> = async ({ params }) => {
     const product = await getProduct(params.productId);
     const suggestProducts = await getProducts({ categoryId: product?.category?.id })
-    return ( 
+    return (
         <div className="bg-white">
             <Container>
                 <div className="px-4 py-10 sm:px-6 lg:px-8">
@@ -26,12 +26,12 @@ const ProductPage: React.FC<ProductPageProps> = async ({ params }) => {
                             <Info data={product} />
                         </div>
                     </div>
-                    <hr className="my-10"/>
+                    <hr className="my-10" />
                     <ProductList title="Related Items" items={suggestProducts} />
                 </div>
             </Container>
         </div>
-     );
+    );
 }
- 
+
 export default ProductPage;

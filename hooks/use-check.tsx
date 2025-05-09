@@ -1,37 +1,51 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
-interface CheckState {
-  items: any[];
-  addToCheck: (item: any) => void;
-  removeItem: (id: string) => void;
-  removeAll: () => void;
-  loadFromStorage: () => void;
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  images: { url: string }[];
+  createdAt: string;
+  creator: { name: string };
+  type: { name: string };
 }
 
-const useCartChecking = create<CheckState>((set) => ({
-  items: [],
-  addToCheck: (item) =>
-    set((state) => {
-      const updatedItems = [...state.items, item];
-      localStorage.setItem('checkItems', JSON.stringify(updatedItems));
-      return { items: updatedItems };
-    }),
-  removeItem: (id) =>
-    set((state) => {
-      const updatedItems = state.items.filter((item) => item.id !== id);
-      localStorage.setItem('checkItems', JSON.stringify(updatedItems));
-      return { items: updatedItems };
-    }),
-  removeAll: () => {
-    localStorage.removeItem('checkItems');
-    return { items: [] };
-  },
-  loadFromStorage: () => {
-    const storedItems = localStorage.getItem('checkItems');
-    if (storedItems) {
-      set({ items: JSON.parse(storedItems) });
+interface CartCheckingState {
+  items: Product[];
+  addItem: (item: Product) => void;
+  removeItem: (id: string) => void;
+  setItems: (items: Product[]) => void;
+}
+
+const useCartChecking = create<CartCheckingState>((set) => {
+  return {
+    items: [],
+    addItem: (item) => {
+      set((state) => {
+        const newItems = [...state.items, item];
+        localStorage.setItem("check_items", JSON.stringify(newItems));
+        return { items: newItems };
+      });
+    },
+    removeItem: (id) => {
+      set((state) => {
+        const newItems = state.items.filter((item) => item.id !== id);
+        localStorage.setItem("check_items", JSON.stringify(newItems));
+        return { items: newItems };
+      });
+    },
+    setItems: (items) => {
+      set((state) => {
+        const isSame = JSON.stringify(state.items) === JSON.stringify(items);
+        if (!isSame) {
+          localStorage.setItem("check_items", JSON.stringify(items));
+          return { items };
+        }
+        return state; 
+      });
     }
-  },
-}));
+  };
+});
+
 
 export default useCartChecking;

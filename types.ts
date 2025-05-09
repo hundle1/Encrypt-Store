@@ -21,6 +21,7 @@ export interface Product {
     updatedAt: string;
     isFeatured: boolean;
     type: Type;
+    hashID: String;
     creator: Creator;
     images: Image[];
     clickCount: number;  // 👈

@@ -11,6 +11,7 @@ interface Query {
     createdAt?: string;
     updatedAt?: string;
     name?: string;
+    hashID?: string;
 }
 
 const getProducts = async (query: Query): Promise<Product[]> => {
