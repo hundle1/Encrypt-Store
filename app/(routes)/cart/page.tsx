@@ -9,61 +9,46 @@ import CheckItem from "./components/check-item";
 import Summary from "./components/summary";
 import SummaryChecking from "./components/summary_check";
 import { Product } from "@/types";
+import { useStateContext } from "@/components/context"; 
 
 const CartPage = () => {
   const [isMounted, setIsMounted] = useState(false);
   const [stopTimer, setStopTimer] = useState(false);
-  const [startTimer, setStartTimer] = useState(false);
-  const [isStartCountdownDisabled, setIsStartCountdownDisabled] = useState(true);
-  const [isCheckingProductDisabled, setIsCheckingProductDisabled] = useState(true);
 
   const cart = useCart();
-  const check = useCartChecking(); // ✅ phải khai báo trước khi dùng trong useEffect
+  const check = useCartChecking();
+  const { lockBuy, connect, address } = useStateContext(); 
 
-  // Load check_items từ localStorage và đồng bộ với zustand
+  // Load check_items từ localStorage
   useEffect(() => {
     const storedCheckItems = localStorage.getItem("check_items");
     if (storedCheckItems) {
       const parsed = JSON.parse(storedCheckItems);
       check.setItems(parsed);
     }
-    // không nên để [check] ở dependency array
-  }, []);
-
-
-  useEffect(() => {
     setIsMounted(true);
-    const startCountdownStatus = sessionStorage.getItem('isStartCountdownDisabled');
-    const checkingProductStatus = sessionStorage.getItem('isCheckingProductDisabled');
-    const timerStatus = sessionStorage.getItem('startTimer');
-
-    setIsStartCountdownDisabled(startCountdownStatus === 'false' ? false : true);
-    setIsCheckingProductDisabled(checkingProductStatus === 'false' ? false : true);
-    setStartTimer(timerStatus === 'true');
   }, []);
 
   const handleCheckout = () => {
-    setStartTimer(false);
-    setIsStartCountdownDisabled(false);
-    sessionStorage.setItem('isStartCountdownDisabled', 'false');
-  };
-
-  const handleStartCountdown = () => {
     setStopTimer(false);
-    setStartTimer(true);
-    setIsStartCountdownDisabled(true);
-    setIsCheckingProductDisabled(false);
-    sessionStorage.setItem('isStartCountdownDisabled', 'true');
-    sessionStorage.setItem('isCheckingProductDisabled', 'false');
   };
 
   const handleItemRemove = (id: string) => {
     check.removeItem(id);
     cart.removeItem(id);
     setStopTimer(true);
-    setStartTimer(false);
-    setIsCheckingProductDisabled(true);
-    sessionStorage.setItem('isCheckingProductDisabled', 'true');
+  };
+
+  // Hàm lockBuy gọi contract (stub)
+    const handleLockBuy = async (productId: string, approve: boolean) => {
+    try {
+      if (!address) await connect(); // 👈 Kết nối Metamask nếu chưa kết nối
+      const tx = await lockBuy(productId, approve);
+      await tx.wait();
+      console.log("Transaction successful:", tx);
+    } catch (err) {
+      console.error("Transaction failed:", err);
+    }
   };
 
   if (!isMounted) return null;
@@ -100,16 +85,19 @@ const CartPage = () => {
               <ul>
                 {Array.isArray(check?.items) &&
                   check.items.map((item) => (
-                    <CheckItem key={item.id} data={item} onRemove={() => handleItemRemove(item.id)} />
+                    <CheckItem
+                      key={item.id}
+                      data={item}
+                      onRemove={() => handleItemRemove(item.id)}
+                    />
                   ))}
               </ul>
             </div>
-            <SummaryChecking
+             <SummaryChecking
               stopTimer={stopTimer}
-              startTimer={startTimer}
-              isStartCountdownDisabled={isStartCountdownDisabled}
-              isCheckingProductDisabled={isCheckingProductDisabled}
-              onStartCountdown={handleStartCountdown}
+              startTimer={check.items.length > 0 && !stopTimer}
+              productId={check.items[0]?.id}
+              onLockBuy={handleLockBuy} // 👈 Gọi từ prop
             />
           </div>
         </div>

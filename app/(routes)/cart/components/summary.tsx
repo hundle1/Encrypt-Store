@@ -6,7 +6,7 @@ import Currency from '@/components/ui/currency';
 import useCart from '@/hooks/use-cart';
 import useCartChecking from '@/hooks/use-check';
 import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 
 interface SummaryProps {
@@ -17,47 +17,50 @@ const Summary: React.FC<SummaryProps> = ({ onCheckout }) => {
   const searchParams = useSearchParams();
   const items = useCart((state) => state.items);
   const removeAll = useCart((state) => state.removeAll);
-  
-  // Dùng hook useCartChecking để truy cập hàm addItem và removeAll
+
   const check = useCartChecking();
   const removeAllChecks = () => {
     console.warn("removeAllChecks is not implemented in useCartChecking.");
   };
+
   const totalPrice = items.reduce((total, item) => total + Number(item.price), 0);
   const { address, connect, preBuy } = useStateContext();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleCheckout = async () => {
     if (items.length === 0) return;
+    setIsLoading(true);
 
     if (!address) {
       await connect();
+      setIsLoading(false);
       return;
     }
 
     const product = items[0];
-    const productId = product.id;
+    const productId = product?.id;
+    if (!productId) {
+      toast.error("Invalid product ID");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const tx = await preBuy(productId);
-      // Nếu tx có phương thức wait, chờ xác nhận giao dịch
-      if (tx && tx.wait) {
-        await tx.wait();
-      }
+      if (tx && tx.wait) await tx.wait();
+
       toast.success("Payment completed.");
-      
-      // Xoá sản phẩm khỏi giỏ hàng (container 1)
-      removeAll(); 
-      
-      // Thêm sản phẩm vào danh sách đang kiểm tra (container 2)
       check.addItem({ ...product, price: Number(product.price) });
-      
-      // Cập nhật lại trạng thái giao diện cha
+      removeAll();
       onCheckout();
     } catch (error) {
       console.error("PreBuy error:", error);
       toast.error("Pre-buy failed.");
+    } finally {
+      setIsLoading(false);
     }
   };
+
 
   useEffect(() => {
     if (searchParams.get('success')) {
@@ -79,9 +82,44 @@ const Summary: React.FC<SummaryProps> = ({ onCheckout }) => {
           <Currency value={totalPrice} />
         </div>
       </div>
-      <Button disabled={items.length === 0} className='w-full mt-6' onClick={handleCheckout}>
-        Checkout
+      <Button
+        disabled={items.length === 0 || isLoading}
+        className={`w-full mt-6 relative transition-all duration-300 ${isLoading
+            ? 'bg-white border border-black text-black'
+            : 'bg-black text-white hover:opacity-80'
+          }`}
+        onClick={handleCheckout}
+      >
+        {isLoading ? (
+          <span className="flex justify-center items-center gap-1">
+            <span className="dot dot1">o</span>
+            <span className="dot dot2">o</span>
+            <span className="dot dot3">o</span>
+          </span>
+        ) : (
+          'Checkout'
+        )}
       </Button>
+      <style jsx>{`
+      .dot {
+        font-weight: bold;
+        color: black;
+        animation: bounce 0.6s infinite;
+      }
+      .dot1 { animation-delay: 0s; }
+      .dot2 { animation-delay: 0.1s; }
+      .dot3 { animation-delay: 0.2s; }
+
+      @keyframes bounce {
+        0%, 80%, 100% {
+          transform: translateY(0);
+        }
+        40% {
+          transform: translateY(-6px);
+        }
+      }
+    `}</style>
+
     </div>
   );
 };

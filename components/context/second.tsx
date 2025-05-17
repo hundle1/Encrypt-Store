@@ -17,6 +17,12 @@ export const StateContextProvider = ({ children }: { children: React.ReactNode }
     const [contract, setContract] = useState<any>(null);
 
     useEffect(() => {
+        if (signer) {
+            setSdk(ThirdwebSDK.fromSigner(signer, "sepolia"));
+        }
+    }, [signer]);
+
+    useEffect(() => {
         if (sdk) {
             const loadContract = async () => {
                 try {
@@ -30,33 +36,32 @@ export const StateContextProvider = ({ children }: { children: React.ReactNode }
         }
     }, [sdk]);
 
-    useEffect(() => {
-        if (signer) {
-            setSdk(ThirdwebSDK.fromSigner(signer, "sepolia"));
-        }
-    }, [signer]);
-
-    // Trả về tx nếu giao dịch thành công
+    // Pre-buy: lock ETH in escrow on-chain
     const preBuy = async (productId: string) => {
         if (!contract) throw new Error("Contract not loaded");
         try {
-            const tx = await contract.call("preBuy", [productId], { value: ethers.utils.parseEther("0.00001") });
-            return tx; // trả về tx để có thể chờ xác nhận trong Summary nếu cần
+            const price = await contract.call("getProductPrice", [productId]);
+            if (!price) throw new Error("Price not found or invalid");
+
+            const tx = await contract.call("preBuy", [productId], { value: price });
+            return tx;
         } catch (error) {
-            console.error("Lỗi trong preBuy:", error);
+            console.error("Error in preBuy:", error);
             throw error;
         }
     };
+
+    // Lock-buy: finalize or refund
     const lockBuy = async (productId: string, approve: boolean) => {
-            if (!contract) throw new Error("Contract not loaded");
-            try {
-                const tx = await contract.call("lockBuy", [productId, approve]);
-                return tx;
-            } catch (error) {
-                console.error("Error in lockBuy:", error);
-                throw error;
-            }
-        };
+        if (!contract) throw new Error("Contract not loaded");
+        try {
+            const tx = await contract.call("lockBuy", [productId, approve]);
+            return tx;
+        } catch (error) {
+            console.error("Error in lockBuy:", error);
+            throw error;
+        }
+    };
 
     return (
         <StateContext.Provider

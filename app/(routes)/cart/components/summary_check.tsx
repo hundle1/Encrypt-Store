@@ -1,45 +1,45 @@
 "use client";
-
+import { useEffect, useState } from "react";
+import { useStateContext } from '@/components/context';
 import Button from "@/components/ui/button";
-import { useState, useEffect } from "react";
 import TimeCountdown from "@/components/ui/time-countdown";
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-}
+import useCartChecking from '@/hooks/use-check';
 
 interface SummaryCheckingProps {
   stopTimer: boolean;
   startTimer: boolean;
-  isStartCountdownDisabled: boolean;
-  isCheckingProductDisabled: boolean;
-  onStartCountdown: () => void;
+  productId: string;
+  onLockBuy: (productId: string, approve: boolean) => void;
 }
 
 const SummaryChecking: React.FC<SummaryCheckingProps> = ({
   stopTimer,
   startTimer,
-  isStartCountdownDisabled,
-  isCheckingProductDisabled,
-  onStartCountdown,
+  productId,
+  onLockBuy,
 }) => {
-  const [isCheckoutDisabled, setIsCheckoutDisabled] = useState(false);
-  const [items, setItems] = useState<Product[]>([]);
+  const { lockBuy } = useStateContext();
+  const check = useCartChecking();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isLocked, setIsLocked] = useState(false); // disable buttons
 
-  useEffect(() => {
-    // Điều chỉnh khi đếm ngược bắt đầu hoặc dừng lại
-    if (startTimer) {
-      setIsCheckoutDisabled(false); // Cho phép checkout khi bắt đầu
-    } else {
-      setIsCheckoutDisabled(true); // Vô hiệu hóa checkout khi không có đếm ngược
+  const handleLock = async (approve: boolean) => {
+    setIsProcessing(true);
+    try {
+      const tx = await lockBuy(productId, approve);
+      await tx.wait();
+
+      // Gọi hàm remove và khóa các nút
+      check.removeItem(productId);
+      setIsLocked(true);
+      onLockBuy(productId, approve);
+    } catch (err) {
+      console.error("LockBuy failed:", err);
+    } finally {
+      setIsProcessing(false);
+      setModalOpen(false);
     }
-  }, [startTimer]);
-
-  const onCheckout = async () => {
-    // Logic checkout nếu cần
   };
 
   return (
@@ -49,7 +49,7 @@ const SummaryChecking: React.FC<SummaryCheckingProps> = ({
         <div className="flex items-center justify-between pt-4 border-t border-gray-200">
           <div className="text-base font-medium text-gray-400">Time counter currently</div>
           <TimeCountdown
-            onTimeEnd={() => setIsCheckoutDisabled(true)}
+            onTimeEnd={() => {}}
             stopTimer={stopTimer}
             startTimer={startTimer}
           />
@@ -57,21 +57,50 @@ const SummaryChecking: React.FC<SummaryCheckingProps> = ({
       </div>
       <div className="flex gap-4">
         <Button
-          disabled={items.length === 0 || isCheckoutDisabled || isCheckingProductDisabled}
+          disabled={isLocked}
           className="w-full mt-6 bg-sky-800"
-          onClick={onCheckout}
         >
           Checking Product
         </Button>
-
         <Button
-          className="w-full mt-6 bg-red-600"
-          onClick={onStartCountdown}
-          disabled={startTimer || isCheckoutDisabled} // Disabled nếu đếm ngược đã bắt đầu
+          className="w-full mt-6 bg-purple-600"
+          disabled={isLocked}
+          onClick={() => setModalOpen(true)}
         >
-          Start CountDown
+          Lock Buy
         </Button>
       </div>
+
+      {modalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg p-6 w-80">
+            <h3 className="text-lg font-semibold mb-4">Finalize Purchase</h3>
+            <div className="flex flex-col space-y-3">
+              <Button
+                disabled={isProcessing}
+                className="w-full"
+                onClick={() => handleLock(false)}
+              >
+                Return Product
+              </Button>
+              <Button
+                disabled={isProcessing}
+                className="w-full bg-green-600"
+                onClick={() => handleLock(true)}
+              >
+                Buy Product
+              </Button>
+            </div>
+            <Button
+              disabled={isProcessing}
+              className="mt-4 w-full bg-gray-300"
+              onClick={() => setModalOpen(false)}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
