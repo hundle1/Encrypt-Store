@@ -59,6 +59,24 @@ const SummaryChecking: React.FC<SummaryCheckingProps> = ({
         <Button
           disabled={isLocked}
           className="w-full mt-6 bg-sky-800"
+          onClick={async () => {
+            try {
+              const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`);
+              const product = await res.json();
+
+              if (!product.hashID) {
+                alert("No hashID found for this product.");
+                return;
+              }
+
+              const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${product.hashID}`;
+
+              // Tải file về
+              window.open(ipfsUrl, '_blank');
+            } catch (err) {
+              console.error("Error checking product:", err);
+            }
+          }}
         >
           Checking Product
         </Button>

@@ -9,7 +9,7 @@ import CheckItem from "./components/check-item";
 import Summary from "./components/summary";
 import SummaryChecking from "./components/summary_check";
 import { Product } from "@/types";
-import { useStateContext } from "@/components/context"; 
+import { useStateContext } from "@/components/context";
 
 const CartPage = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -17,7 +17,7 @@ const CartPage = () => {
 
   const cart = useCart();
   const check = useCartChecking();
-  const { lockBuy, connect, address } = useStateContext(); 
+  const { lockBuy, connect, address } = useStateContext();
 
   // Load check_items từ localStorage
   useEffect(() => {
@@ -40,7 +40,7 @@ const CartPage = () => {
   };
 
   // Hàm lockBuy gọi contract (stub)
-    const handleLockBuy = async (productId: string, approve: boolean) => {
+  const handleLockBuy = async (productId: string, approve: boolean) => {
     try {
       if (!address) await connect(); // 👈 Kết nối Metamask nếu chưa kết nối
       const tx = await lockBuy(productId, approve);
@@ -93,7 +93,7 @@ const CartPage = () => {
                   ))}
               </ul>
             </div>
-             <SummaryChecking
+            <SummaryChecking
               stopTimer={stopTimer}
               startTimer={check.items.length > 0 && !stopTimer}
               productId={check.items[0]?.id}
