@@ -11,7 +11,6 @@ export const revalidate = 0;
 const HomePage = async () => {
     const billboards = await getBillboards(); // Lấy tất cả billboards
     const products = await getProducts({ isFeatured: true });
-    const creators = await getCreatorss({});
 
     return (
         <Container>
